@@ -66,10 +66,17 @@
   <p id="c-sum"></p><div id="c-src"></div></div>
 <div id="hint">drag to pan · scroll to zoom · click a node</div>
 <script>
+window.onerror = function (m) {
+  var h = document.getElementById("hint");
+  if (h) h.textContent = "error: " + m;
+};
+</script>
+<script>
+document.getElementById("hint").textContent = "booting graph…";
 const COLORS = {
   reasoning:"#e05f5f", agents:"#e0a95f", architecture:"#5fb8e0",
   training:"#b45fe0", retrieval:"#5fe0a0", multimodal:"#e05fb4",
-  infrastructure:"#8f9fe0", "interaction-protocols","#c9e05f",
+  infrastructure:"#8f9fe0", "interaction-protocols":"#c9e05f",
   evaluation:"#5fd9e0", safety:"#e08f5f"
 };
 fetch("ontology.json").then(r => r.json()).then(o => {
@@ -131,6 +138,8 @@ fetch("ontology.json").then(r => r.json()).then(o => {
       node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
+  document.getElementById("hint").textContent =
+    "drag to pan · scroll to zoom · click a node";
   const legend = document.getElementById("legend");
   Object.entries(COLORS).forEach(([cat, col]) => {
     const row = document.createElement("div");
