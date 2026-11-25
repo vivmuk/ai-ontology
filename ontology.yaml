@@ -1,0 +1,361 @@
+# Living ontology of emerging AI concepts.
+# Baseline: 2024 → present. Updated weekly by update.py (Venice web search).
+# Schema:
+#   meta:
+#     updated: ISO date of last update
+#     maintainers: free text
+#   concepts:
+#     - id: kebab-case unique id
+#       label: human name
+#       category: one of the categories in meta.categories
+#       first_seen: YYYY-MM — when the concept emerged into broad AI awareness
+#       summary: one or two sentences, graduate-level, no fluff
+#       aliases: optional list of alternate names
+#       sources: list of {title, url} — provenance for emergence
+#       status: emerging | established | absorbed (absorbed = folded into a successor)
+#   relations:
+#     - from: concept id
+#       to: concept id
+#       type: enables | derives_from | supersedes | extends | used_with | contrasts_with
+#       since: YYYY-MM
+meta:
+  updated: "2026-11-25"
+  maintainer: "Vega (Hermes agent) for Vivek"
+  scope: "AI concepts that emerged or became mainstream from 2024 onward"
+  categories:
+    - reasoning
+    - agents
+    - architecture
+    - training
+    - retrieval
+    - multimodal
+    - infrastructure
+    - interaction-protocols
+    - evaluation
+    - safety
+
+concepts:
+  # ---- reasoning ----
+  - id: test-time-compute-scaling
+    label: Test-time compute scaling
+    category: reasoning
+    first_seen: 2024-09
+    summary: "Improving answer quality by spending more inference-time computation (longer chains, search, verification) instead of more pretraining. Became the dominant post-pretraining scaling axis."
+    aliases: ["inference-time scaling"]
+    sources:
+      - {title: "OpenAI o1 system card", url: "https://openai.com/index/openai-o1-system-card/"}
+    status: established
+  - id: reasoning-models
+    label: Reasoning models
+    category: reasoning
+    first_seen: 2024-09
+    summary: "Models trained to produce extended hidden or visible chains of thought before answering (o1, R1, QwQ, Claude with extended thinking), trading latency for accuracy on hard problems."
+    sources:
+      - {title: "OpenAI o1", url: "https://openai.com/index/learning-to-reason-with-llms/"}
+      - {title: "DeepSeek-R1", url: "https://arxiv.org/abs/2501.12948"}
+    status: established
+  - id: reinforcement-learning-from-verifiable-rewards
+    label: RL from verifiable rewards (RLVR)
+    category: training
+    first_seen: 2024-12
+    summary: "Training reasoning models with RL where the reward is a programmatically checkable signal (unit tests, exact answers, formal proofs) rather than a learned reward model, avoiding reward hacking of RLHF."
+    aliases: ["RLVR"]
+    sources:
+      - {title: "DeepSeek-R1", url: "https://arxiv.org/abs/2501.12948"}
+    status: established
+  - id: chain-of-thought-monitoring
+    label: Chain-of-thought monitoring
+    category: safety
+    first_seen: 2025-01
+    summary: "Reading a reasoning model's own chain of thought to detect scheming or deception, exploiting faithfulness of the CoT as an interpretability channel."
+    sources:
+      - {title: "OpenAI on monitoring reasoning models", url: "https://openai.com/index/chain-of-thought/"}
+    status: emerging
+  - id: verifiers-as-reward
+    label: Verifier-driven training loops
+    category: training
+    first_seen: 2025-03
+    summary: "Closing the loop from test-time verification to training: mining hard problems from failed verifications and feeding them back, turning verifiers into curriculum generators."
+    status: emerging
+
+  # ---- agents ----
+  - id: model-context-protocol
+    label: Model Context Protocol (MCP)
+    category: interaction-protocols
+    first_seen: 2024-11
+    summary: "Open standard (JSON-RPC) exposing tools, resources and prompts from any server to any MCP client, doing for agent-tool wiring what LSP did for editors."
+    aliases: ["MCP"]
+    sources:
+      - {title: "Model Context Protocol", url: "https://modelcontextprotocol.io"}
+    status: established
+  - id: agentic-coding
+    label: Agentic coding
+    category: agents
+    first_seen: 2024-10
+    summary: "Autonomous or semi-autonomous agents that edit repos, run tests and iterate on whole tasks rather than completing single files, making coding the first mass-market agent workflow."
+    status: established
+  - id: computer-use-agents
+    label: Computer-use agents
+    category: agents
+    first_seen: 2024-10
+    summary: "Agents operating a GUI like a human (screenshot in, click/keystroke out), generalising tool use to arbitrary uninstrumented software."
+    sources:
+      - {title: "Claude computer use", url: "https://www.anthropic.com/news/3-5-sonnet-upgrade"}
+    status: established
+  - id: agent-harnesses
+    label: Agent harnesses
+    category: agents
+    first_seen: 2025-01
+    summary: "The scaffold around the model — tool routing, context compaction, subagents, permissioning, recovery loops — now a distinct engineering discipline and a competitive moat."
+    status: established
+  - id: multi-agent-orchestration
+    label: Multi-agent orchestration
+    category: agents
+    first_seen: 2025-02
+    summary: "Fan-out patterns where a planner delegates to parallel subagents and merges results; economics and reliability, not capability, are the binding constraints."
+    status: emerging
+  - id: deep-research-agents
+    label: Deep research agents
+    category: agents
+    first_seen: 2025-02
+    summary: "Agents that run minutes-long search-read-synthesize loops with citations to produce analyst-grade reports, commoditising a white-collar workflow."
+    status: established
+  - id: context-engineering
+    label: Context engineering
+    category: agents
+    first_seen: 2025-06
+    summary: "Deliberate management of what occupies the model's finite context — retrieval, compaction, just-in-time loading — superseding prompt engineering as the framing problem."
+    status: established
+  - id: skills-as-artifacts
+    label: Skills as portable artifacts
+    category: agents
+    first_seen: 2025-10
+    summary: "Bundling procedures, references and scripts as modular files an agent loads on demand (Agent Skills), making agent know-how reusable across harnesses."
+    status: emerging
+
+  # ---- architecture ----
+  - id: sparse-mixture-of-experts
+    label: Sparse mixture-of-experts at scale
+    category: architecture
+    first_seen: 2024-12
+    summary: "Routing each token to a small subset of expert MLPs; the default recipe for frontier open weights (DeepSeek-V3, Qwen) to hold quality at a fraction of per-token FLOPs."
+    aliases: ["MoE"]
+    status: established
+  - id: linear-attention-ssm-hybrids
+    label: Linear-attention / SSM hybrids
+    category: architecture
+    first_seen: 2024-12
+    summary: "Interleaving state-space or linear-attention layers with full attention (Mamba-2 hybrids, Jamba, MiniMax) to cut KV memory on long sequences with near-attention quality."
+    status: established
+  - id: native-multimodal-backbones
+    label: Native multimodal backbones
+    category: multimodal
+    first_seen: 2024-05
+    summary: "Single models trained from the start across text, image, audio and video with early fusion, replacing stitched modality adapters."
+    status: established
+  - id: diffusion-language-models
+    label: Diffusion language models
+    category: architecture
+    first_seen: 2025-02
+    summary: "Text generated by iterative denoising over the whole sequence (Mercury Coder, Gemini Diffusion), promising parallel decoding and controllable editing."
+    status: emerging
+  - id: yoco-style-decoupled-attention
+    label: Decoupled/cached attention for infinite context
+    category: architecture
+    first_seen: 2024-05
+    summary: "Asymmetric attention where each new layer attends to a small cached representation of the prefix (YOCO, PyramidInfer), making 1M-token contexts tractable."
+    status: emerging
+  - id: test-time-training
+    label: Test-time training
+    category: architecture
+    first_seen: 2024-12
+    summary: "Updating a slice of the network's weights at inference time on each new input (video diffusion in-context learning, TTT layers), turning context length into a learning problem."
+    status: emerging
+
+  # ---- training ----
+  - id: mid-training
+    label: Mid-training
+    category: training
+    first_seen: 2025-04
+    summary: "A distinct phase between pretraining and post-training that injects long-context, reasoning, and tool-use capabilities before RL, now an explicit recipe item."
+    status: emerging
+  - id: distillation-from-reasoning-teachers
+    label: Distillation from reasoning teachers
+    category: training
+    first_seen: 2025-01
+    summary: "Compressing frontier reasoning traces into small dense models, giving sub-10B models graduate-level math and code ability at chat-model cost."
+    status: established
+  - id: synthetic-data-curation
+    label: Synthetic data curation loops
+    category: training
+    first_seen: 2025-03
+    summary: "Generating, verifying and de-duplicating training data with models, then training on it — the engine of the data wall workaround."
+    status: established
+  - id: self-improving-model-stacks
+    label: Self-improving model stacks
+    category: training
+    first_seen: 2025-05
+    summary: "Pipelines where a model generates its own next-stage training data and verifiers filter it (Absolute Zero-style), approaching closed-loop capability growth."
+    status: emerging
+
+  # ---- retrieval ----
+  - id: graph-rag
+    label: GraphRAG
+    category: retrieval
+    first_seen: 2024-04
+    summary: "Building a entity-relationship graph over the corpus and retrieving multi-hop subgraphs, fixing vector search's failure on 'how does X connect to Y' questions."
+    status: established
+  - id: agentic-rag
+    label: Agentic RAG
+    category: retrieval
+    first_seen: 2024-09
+    summary: "Search driven by an agent loop that reformulates queries, follows citations and decides when to stop, replacing the single frozen retrieve-then-read pipeline."
+    status: established
+  - id: late-interaction-retrieval
+    label: Late-interaction retrieval
+    category: retrieval
+    first_seen: 2024-04
+    summary: "Multi-vector embeddings scored per-token at query time (ColBERT-line), narrowing the gap between bi-encoders and cross-encoders."
+    status: emerging
+  - id: matryoshka-embeddings
+    label: Matryoshka embeddings
+    category: retrieval
+    first_seen: 2024-04
+    summary: "Embeddings trained so any prefix is itself a valid lower-dim embedding, letting one model serve many cost/precision points."
+    status: emerging
+
+  # ---- multimodal ----
+  - id: autoregressive-image-editing
+    label: Instruction image editing
+    category: multimodal
+    first_seen: 2024-08
+    summary: "Editing photos from natural-language instructions with pixel-perfect locality (Nano Banana / Gemini image line), making multimodal models practical creation tools."
+    status: established
+  - id: unified-video-generation
+    label: Unified text-to-video
+    category: multimodal
+    first_seen: 2024-06
+    summary: "Minute-scale, physics-plausible video with synced audio from one model (Veo, Sora, Kling), closing the sim-to-real gap for world simulation."
+    status: established
+  - id: world-models-for-agents
+    label: World models for agents
+    category: multimodal
+    first_seen: 2025-09
+    summary: "Learning interactive simulators of environments (Genie-3 line) so agents can practice inside generated worlds instead of costly reality."
+    status: emerging
+  - id: real-time-speech-to-speech
+    label: Full-duplex speech-to-speech
+    category: multimodal
+    first_seen: 2024-08
+    summary: "Single neural stack hearing and speaking with turn-taking and interruption (GPT-4o voice mode line), killing the ASR-LLM-TTS relay."
+    status: established
+
+  # ---- infrastructure ----
+  - id: kv-cache-compression
+    label: KV-cache compression
+    category: infrastructure
+    first_seen: 2024-07
+    summary: "Sliding windows, quantised caches and cross-layer sharing to fit long contexts into real VRAM; the memory wall of serving long-context models."
+    status: emerging
+  - id: speculative-multi-draft-decoding
+    label: Multi-draft speculative decoding
+    category: infrastructure
+    first_seen: 2025-01
+    summary: "Cheap draft models (or heads) proposing several continuations accepted in one verification pass (EAGLE-3, Medusa line), multiplying decode throughput."
+    status: emerging
+  - id: prompt-caching-economics
+    label: Prompt caching economics
+    category: infrastructure
+    first_seen: 2024-10
+    summary: "Providers charging cents for cached prefix tokens, which restructured agent design around stable system prompts and made long agent sessions affordable."
+    status: established
+  - id: on-device-slm-tiers
+    label: On-device SLM tiers
+    category: infrastructure
+    first_seen: 2024-06
+    summary: "3-4B models tuned for phones/laptops (Phi, Gemma, Qwen--small) handling routine turns locally with cloud fallback, shifting the cost curve."
+    status: emerging
+  - id: inference-cost-collapse
+    label: Inference cost collapse
+    category: infrastructure
+    first_seen: 2025-01
+    summary: "Price per intelligence unit falling ~10x/year through distillation + competition, making token-cost a rounding error in agent economics."
+    status: established
+
+  # ---- interaction protocols / evaluation / safety ----
+  - id: agent-evaluations-harnesses
+    label: Agent evaluation harnesses
+    category: evaluation
+    first_seen: 2025-01
+    summary: "Terminal-bench, SWE-bench-Verified, tau-bench: task suites run by real harnesses with tools, measuring end-to-end agent reliability rather than quiz accuracy."
+    status: emerging
+  - id: llm-as-judge-drift
+    label: LLM-as-judge at scale
+    category: evaluation
+    first_seen: 2024-06
+    summary: "Rubric-based model graders for open-ended output; quality now gates on judge quality, making judge calibration its own research area."
+    status: established
+  - id: interpretability-sparse-autoencoders
+    label: Sparse-autoencoder interpretability
+    category: safety
+    first_seen: 2024-05
+    summary: "Decomposing activations into monosemantic features with SAEs, giving steering vectors and an auditable map of what a model knows."
+    status: emerging
+  - id: agent-identity-keys
+    label: Agent identity and delegation
+    category: safety
+    first_seen: 2025-03
+    summary: "Giving agents their own keys, credentials and spend limits instead of sharing the user's, so systems can attribute and revoke machine actions."
+    status: emerging
+  - id: evals-for-scheming
+    label: Evaluations for scheming
+    category: safety
+    first_seen: 2025-06
+    summary: "Sandboxed in-context evaluations (SCALE, Apollo suite) that check whether models pursue subgoals, sandbag or shut down oversight when given the chance."
+    status: emerging
+
+relations:
+  - {from: test-time-compute-scaling, to: reasoning-models, type: enables, since: 2024-09}
+  - {from: reinforcement-learning-from-verifiable-rewards, to: reasoning-models, type: enables, since: 2025-01}
+  - {from: reasoning-models, to: agentic-coding, type: extends, since: 2025-01}
+  - {from: reasoning-models, to: chain-of-thought-monitoring, type: enables, since: 2025-01}
+  - {from: reinforcement-learning-from-verifiable-rewards, to: verifiers-as-reward, type: derives_from, since: 2025-03}
+  - {from: test-time-compute-scaling, to: verifiers-as-reward, type: derives_from, since: 2025-03}
+  - {from: model-context-protocol, to: agent-harnesses, type: used_with, since: 2024-11}
+  - {from: model-context-protocol, to: agentic-coding, type: used_with, since: 2025-01}
+  - {from: agent-harnesses, to: multi-agent-orchestration, type: enables, since: 2025-02}
+  - {from: multi-agent-orchestration, to: deep-research-agents, type: enables, since: 2025-02}
+  - {from: context-engineering, to: agent-harnesses, type: extends, since: 2025-06}
+  - {from: skills-as-artifacts, to: agent-harnesses, type: extends, since: 2025-10}
+  - {from: sparse-mixture-of-experts, to: inference-cost-collapse, type: enables, since: 2025-01}
+  - {from: linear-attention-ssm-hybrids, to: kv-cache-compression, type: enables, since: 2024-12}
+  - {from: kv-cache-compression, to: prompt-caching-economics, type: enables, since: 2024-10}
+  - {from: prompt-caching-economics, to: deep-research-agents, type: enables, since: 2025-02}
+  - {from: speculative-multi-draft-decoding, to: inference-cost-collapse, type: enables, since: 2025-01}
+  - {from: distillation-from-reasoning-teachers, to: on-device-slm-tiers, type: enables, since: 2025-02}
+  - {from: distillation-from-reasoning-teachers, to: inference-cost-collapse, type: enables, since: 2025-01}
+  - {from: synthetic-data-curation, to: self-improving-model-stacks, type: enables, since: 2025-05}
+  - {from: verifiers-as-reward, to: self-improving-model-stacks, type: enables, since: 2025-05}
+  - {from: graph-rag, to: agentic-rag, type: derives_from, since: 2024-09}
+  - {from: agentic-rag, to: deep-research-agents, type: enables, since: 2025-02}
+  - {from: context-engineering, to: agentic-rag, type: extends, since: 2025-06}
+  - {from: matryoshka-embeddings, to: graph-rag, type: used_with, since: 2024-04}
+  - {from: late-interaction-retrieval, to: agentic-rag, type: extends, since: 2024-09}
+  - {from: native-multimodal-backbones, to: autoregressive-image-editing, type: enables, since: 2024-08}
+  - {from: native-multimodal-backbones, to: real-time-speech-to-speech, type: enables, since: 2024-08}
+  - {from: native-multimodal-backbones, to: unified-video-generation, type: enables, since: 2024-06}
+  - {from: unified-video-generation, to: world-models-for-agents, type: derives_from, since: 2025-09}
+  - {from: world-models-for-agents, to: computer-use-agents, type: used_with, since: 2025-09}
+  - {from: diffusion-language-models, to: inference-cost-collapse, type: enables, since: 2025-02}
+  - {from: yoco-style-decoupled-attention, to: kv-cache-compression, type: enables, since: 2024-05}
+  - {from: test-time-training, to: linear-attention-ssm-hybrids, type: extends, since: 2024-12}
+  - {from: agentic-coding, to: agent-evaluations-harnesses, type: enables, since: 2025-01}
+  - {from: agent-harnesses, to: agent-evaluations-harnesses, type: enables, since: 2025-01}
+  - {from: llm-as-judge-drift, to: agent-evaluations-harnesses, type: used_with, since: 2025-01}
+  - {from: interpretability-sparse-autoencoders, to: evals-for-scheming, type: used_with, since: 2025-06}
+  - {from: chain-of-thought-monitoring, to: evals-for-scheming, type: enables, since: 2025-06}
+  - {from: agent-identity-keys, to: multi-agent-orchestration, type: used_with, since: 2025-03}
+  - {from: reasoning-models, to: evals-for-scheming, type: enables, since: 2025-06}
+  - {from: mid-training, to: reasoning-models, type: enables, since: 2025-04}
+  - {from: mid-training, to: test-time-compute-scaling, type: extends, since: 2025-04}
+  - {from: computer-use-agents, to: agentic-coding, type: contrasts_with, since: 2025-01}
