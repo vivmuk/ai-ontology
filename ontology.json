@@ -396,6 +396,58 @@
    "first_seen": "2025-06",
    "summary": "Sandboxed in-context evaluations (SCALE, Apollo suite) that check whether models pursue subgoals, sandbag or shut down oversight when given the chance.",
    "status": "emerging"
+  },
+  {
+   "id": "manifold-constrained-hyper-connections",
+   "label": "manifold-constrained-hyper-connections",
+   "category": "architecture",
+   "first_seen": "2026-11",
+   "summary": "An architectural technique that applies geometric constraints, such as doubly stochastic matrices and Sinkhorn-Knopp normalization, to hyper-connections to stabilize signal transformation and routing across deep network layers.",
+   "aliases": [
+    "mHC"
+   ],
+   "sources": [
+    {
+     "title": "AI Concepts and Techniques in 2026: Memory, Inference, Fine-Tuning & Tokens",
+     "url": "https://www.turingpost.com/p/ai-concepts-and-techniques-in-2026-memory-inference-fine-tuning-tokens"
+    }
+   ],
+   "status": "emerging"
+  },
+  {
+   "id": "agent-management-platforms",
+   "label": "agent-management-platforms",
+   "category": "infrastructure",
+   "first_seen": "2026-11",
+   "summary": "An emerging class of enterprise infrastructure designed to orchestrate, monitor, and manage autonomous AI agents at scale, utilizing standardized protocol stacks to minimize integration and switching costs.",
+   "aliases": [
+    "agent-management"
+   ],
+   "sources": [
+    {
+     "title": "The State of AI Agents: November 2026 - What 30 Days and 200+ Repositories Reveal About the Next Frontier",
+     "url": "https://www.coddykit.com/blog/the-state-of-ai-agents-november-2026-what-30-days-and-200-repositories-reveal-ab-5130034"
+    }
+   ],
+   "status": "emerging"
+  },
+  {
+   "id": "verifiable-task-time-horizons",
+   "label": "verifiable-task-time-horizons",
+   "category": "evaluation",
+   "first_seen": "2026-11",
+   "summary": "An evaluation framework that measures agent capabilities over extended, verifiable task distributions (TH2) to track capability scaling and doubling times distinct from short-horizon tasks.",
+   "aliases": [
+    "TH2",
+    "verifiable-time-horizons"
+   ],
+   "sources": [
+    {
+     "title": "AI R&D-relevant model capabilities are improving rapidly and are getting harder to measure - METR",
+     "url": "https://metr.org/blog/2026-11-20-q4-2026-capability-update"
+    }
+   ],
+   "status": "emerging"
   }
  ],
  "relations": [

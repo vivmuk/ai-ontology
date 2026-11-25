@@ -1,0 +1,5 @@
+
+## 2026-11-25 (+3 concepts, +0 relations)
+- **manifold-constrained-hyper-connections** (architecture, 2026-11): An architectural technique that applies geometric constraints, such as doubly stochastic matrices and Sinkhorn-Knopp normalization, to hyper-connections to stabilize signal transfo — https://www.turingpost.com/p/ai-concepts-and-techniques-in-2026-memory-inference-fine-tuning-tokens
+- **agent-management-platforms** (infrastructure, 2026-11): An emerging class of enterprise infrastructure designed to orchestrate, monitor, and manage autonomous AI agents at scale, utilizing standardized protocol stacks to minimize integr — https://www.coddykit.com/blog/the-state-of-ai-agents-november-2026-what-30-days-and-200-repositories-reveal-ab-5130034
+- **verifiable-task-time-horizons** (evaluation, 2026-11): An evaluation framework that measures agent capabilities over extended, verifiable task distributions (TH2) to track capability scaling and doubling times distinct from short-horiz — https://metr.org/blog/2026-11-20-q4-2026-capability-update
