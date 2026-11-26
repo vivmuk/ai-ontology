@@ -384,7 +384,8 @@ $("logout").addEventListener("click", () => {
 
 /* ---------- boot ---------- */
 (async () => {
-  const r = await fetch("/api/ontology");
+  let r = await fetch("/api/ontology");
+  if (r.status === 404) r = await fetch("ontology.json"); // static hosts (GitHub Pages): open viewer, no gate
   if (r.status === 401) { $("login").hidden = false; $("pw").focus(); return; }
   if (!r.ok) { $("login").hidden = false; $("loginerr").textContent = "server error — retry shortly"; return; }
   enterApp(await r.json());
