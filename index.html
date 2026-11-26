@@ -249,6 +249,19 @@
     border-radius: 999px; border: 1px solid var(--edge); backdrop-filter: blur(6px);
   }
 
+  #zoomui {
+    position: absolute; left: 14px; bottom: 15px; z-index: 6;
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--panel); border: 1px solid var(--edge); border-radius: 12px;
+    padding: 4px; box-shadow: var(--shadow-sm);
+  }
+  #zoomui button {
+    width: 32px; height: 32px; border-radius: 8px; color: var(--ink-2);
+    display: grid; place-items: center; font-size: 15px; line-height: 1;
+    transition: background .12s, color .12s;
+  }
+  #zoomui button:hover { background: var(--panel-2); color: var(--ink); }
+
   @media (max-width: 860px) {
     main { grid-template-columns: 1fr; }
     #side {
@@ -306,6 +319,11 @@
         <div class="aliases" id="c-alias"></div>
         <div id="c-rels"></div>
         <div id="c-src"></div>
+      </div>
+      <div id="zoomui">
+        <button id="zin" aria-label="Zoom in" title="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out" title="Zoom out">−</button>
+        <button id="zfit" aria-label="Fit to view" title="Fit graph to view">⛶</button>
       </div>
       <div id="hint">drag to pan · scroll to zoom · click a node · / to search</div>
     </div>
@@ -486,8 +504,11 @@ function buildGraph() {
   const colors = COLORS();
   const svg = d3.select("#graphwrap").append("svg");
   svg.attr("viewBox", [0, 0, W, H]);
-  const g = svg.append("g");
-  svg.call(d3.zoom().scaleExtent([0.12, 8]).on("zoom", (e) => g.attr("transform", e.transform)));
+  const g = svg.append("g");  /* zoom/pan target — links and nodes must live INSIDE it */
+  const zoomBehavior = d3.zoom().scaleExtent([0.12, 8]).on("zoom", (e) => g.attr("transform", e.transform));
+  svg.call(zoomBehavior);
+  state.zoom = zoomBehavior;
+  state.svg = svg;
 
   state.nodes = state.o.concepts.map((c) => ({ ...c }));
   const byId = new Map(state.nodes.map((n) => [n.id, n]));
@@ -502,9 +523,9 @@ function buildGraph() {
     deg[l.target] = (deg[l.target] || 0) + 1;
   }
 
-  state.sel = svg.append("g").selectAll(".link")
+  state.sel = g.append("g").selectAll(".link")
     .data(state.links).join("line").attr("class", "link");
-  state.nod = svg.append("g").selectAll(".node")
+  state.nod = g.append("g").selectAll(".node")
     .data(state.nodes, (d) => d.id).join("g").attr("class", "node")
     .call(d3.drag()
       .on("start", (e, d) => { if (!e.active) state.sim.alphaTarget(.25).restart(); d.fx = d.x; d.fy = d.y; })
@@ -519,16 +540,28 @@ function buildGraph() {
     .attr("stroke", (d) => colors[d.category] || "#888");
   state.nod.append("text").attr("dx", 13).attr("dy", 3.6).text((d) => d.label);
 
+  /* clustered layout: category anchors on a ring keep the graph compact and grouped */
+  const cats = Object.keys(colors);
+  const anchors = {};
+  const R = Math.min(W, H) * 0.34;
+  cats.forEach((cat, i) => {
+    const a = (i / cats.length) * 2 * Math.PI - Math.PI / 2;
+    anchors[cat] = { x: W / 2 + Math.cos(a) * R * 1.35, y: H / 2 + Math.sin(a) * R };
+  });
+
   state.sim = d3.forceSimulation(state.nodes)
-    .force("link", d3.forceLink(state.links).id((d) => d.id).distance(96).strength(.32))
-    .force("charge", d3.forceManyBody().strength(-330))
-    .force("center", d3.forceCenter(W / 2, H / 2))
-    .force("collide", d3.forceCollide(27))
+    .force("link", d3.forceLink(state.links).id((d) => d.id).distance(72).strength(.35))
+    .force("charge", d3.forceManyBody().strength(-240))
+    .force("collide", d3.forceCollide(30))
+    .force("x", d3.forceX((d) => (anchors[d.category] || {x: W/2}).x).strength(.09))
+    .force("y", d3.forceY((d) => (anchors[d.category] || {y: H/2}).y).strength(.11))
+    .alphaDecay(.05)
     .on("tick", () => {
       state.sel.attr("x1", (d) => d.source.x).attr("y1", (d) => d.source.y)
               .attr("x2", (d) => d.target.x).attr("y2", (d) => d.target.y);
       state.nod.attr("transform", (d) => `translate(${d.x},${d.y})`);
-    });
+    })
+    .on("end", () => { if (!state.fitted) { state.fitted = true; fitView(); } });
 
   state.nod.on("mouseenter", (e, d) => highlight(d.id, true))
          .on("mouseleave", () => highlight(null))
@@ -537,10 +570,37 @@ function buildGraph() {
 
   $("loadmsg").hidden = true;
   window.addEventListener("resize", () => {
-    state.sim.force("center", d3.forceCenter(wrap.clientWidth / 2, wrap.clientHeight / 2));
+    state.sim.force("center", null);
     svg.attr("viewBox", [0, 0, wrap.clientWidth, wrap.clientHeight]);
   });
 }
+
+/* fit the whole graph in view with padding — the guaranteed way to see everything */
+function fitView() {
+  if (!state.nodes.length || !state.svg) return;
+  const wrap = $("graphwrap");
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  /* measure REAL extents: halo radius + rendered label width via getComputedTextLength */
+  state.nod.each(function (d) {
+    const text = this.querySelector("text");
+    const halo = this.querySelector(".halo");
+    const r = halo ? halo.r.baseVal.value : 12;
+    const tw = text ? text.getComputedTextLength() : 0;
+    x0 = Math.min(x0, d.x - r - 6);
+    x1 = Math.max(x1, d.x + 13 + tw + 6);
+    y0 = Math.min(y0, d.y - r - 6);
+    y1 = Math.max(y1, d.y + r + 6);
+  });
+  x0 -= 20; y0 -= 20; x1 += 20; y1 += 20;
+  const k = Math.min(8, Math.max(0.12, Math.min(W / (x1 - x0), H / (y1 - y0))));
+  const tx = (W - k * (x0 + x1)) / 2, ty = (H - k * (y0 + y1)) / 2;
+  const t = d3.zoomIdentity.translate(tx, ty).scale(k);
+  state.svg.transition().duration(450).call(state.zoom.transform, t);
+}
+$("zin").addEventListener("click", () => state.svg && state.svg.transition().duration(200).call(state.zoom.scaleBy, 1.35));
+$("zout").addEventListener("click", () => state.svg && state.svg.transition().duration(200).call(state.zoom.scaleBy, 1 / 1.35));
+$("zfit").addEventListener("click", () => fitView());
 function neighbors(id) {
   const n = new Set([id]);
   for (const l of state.links) {
