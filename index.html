@@ -1,166 +1,630 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Emerging AI Concepts — Living Ontology</title>
+<title>AI Concepts — Living Ontology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0c0f14; --panel: #131822; --ink: #e8ecf2; --muted: #8b95a5;
-    --edge: #26303f; --accent: #6ea8fe;
+    --bg: #faf9f7;
+    --bg-dot: rgba(28, 40, 60, .055);
+    --bg-2: #f3f1ec;
+    --panel: #ffffff;
+    --panel-2: #f7f5f0;
+    --edge: #e6e2d8;
+    --edge-2: #d8d3c6;
+    --ink: #1c2430;
+    --ink-2: #3d4756;
+    --muted: #7a8291;
+    --accent: #2563c7;
+    --accent-2: #3b7ae0;
+    --err: #cc3d3d;
+    --shadow: 0 1px 2px rgba(24,32,46,.05), 0 12px 34px rgba(24,32,46,.09);
+    --shadow-sm: 0 1px 2px rgba(24,32,46,.07);
+    --r: 10px; --r-lg: 16px;
+    --link: #c9c2b2;
+    --node-stroke: rgba(255,255,255,.9);
+    --node-text: #3d4756;
   }
-  * { box-sizing: border-box; margin: 0; }
-  body { background: var(--bg); color: var(--ink);
-    font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-    overflow: hidden; }
-  header { position: fixed; top: 0; left: 0; right: 0; z-index: 10;
-    display: flex; align-items: baseline; gap: 16px; padding: 14px 22px;
-    background: linear-gradient(180deg, rgba(12,15,20,.94), rgba(12,15,20,.75) 70%, transparent);
-    pointer-events: none; }
-  header h1 { font-size: 17px; font-weight: 650; letter-spacing: .02em; }
-  header .sub { color: var(--muted); font-size: 12.5px; }
-  header .count { margin-left: auto; color: var(--muted); font-size: 12.5px;
-    font-variant-numeric: tabular-nums; }
-  #legend { position: fixed; left: 18px; bottom: 18px; z-index: 10;
-    background: var(--panel); border: 1px solid var(--edge); border-radius: 12px;
-    padding: 12px 14px; font-size: 12px; max-width: 230px; }
-  #legend .row { display: flex; align-items: center; gap: 8px; padding: 2.5px 0;
-    cursor: pointer; user-select: none; }
-  #legend .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-  #legend .row.off { opacity: .35; }
-  svg { display: block; }
-  .link { stroke: #3a4657; stroke-opacity: .5; stroke-width: 1.1px; fill: none; }
-  .node circle { stroke-width: 1.5; cursor: pointer;
-    transition: r .18s ease; }
-  .node circle.established { stroke-opacity: .9; }
-  .node circle.emerging { stroke-dasharray: 3 2.5; }
-  .node text { fill: #c6cedb; font-size: 10.5px; paint-order: stroke;
-    stroke: #0c0f14; stroke-width: 3px; stroke-linejoin: round;
-    pointer-events: none; }
-  .node:hover text { fill: #fff; }
-  #card { position: fixed; right: 18px; top: 64px; width: 320px; z-index: 10;
-    background: var(--panel); border: 1px solid var(--edge); border-radius: 14px;
-    padding: 16px 18px; display: none; }
-  #card h2 { font-size: 15px; margin-bottom: 2px; }
-  #card .meta { color: var(--muted); font-size: 11.5px; margin-bottom: 10px; }
-  #card p { font-size: 13px; color: #cdd5e0; }
-  #card a { color: var(--accent); text-decoration: none; font-size: 12px;
-    display: block; margin-top: 3px; overflow: hidden; text-overflow: ellipsis;
-    white-space: nowrap; }
-  #card .close { position: absolute; top: 8px; right: 12px; cursor: pointer;
-    color: var(--muted); }
-  #hint { position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
-    color: var(--muted); font-size: 12px; z-index: 9; }
+  [data-theme="dark"] {
+    --bg: #0b0e13;
+    --bg-dot: rgba(160,190,230,.05);
+    --bg-2: #0f131a;
+    --panel: #141922;
+    --panel-2: #1a2029;
+    --edge: #232b37;
+    --edge-2: #2e3745;
+    --ink: #e9edf3;
+    --ink-2: #b6c0cd;
+    --muted: #7f8a99;
+    --accent: #6ea8fe;
+    --accent-2: #9ecbff;
+    --err: #ff6b6b;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 18px 44px rgba(0,0,0,.4);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.25);
+    --link: #35415a;
+    --node-stroke: rgba(6,9,13,.85);
+    --node-text: #b6c0cd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 400 14px/1.5 "Lexend", ui-sans-serif, system-ui, sans-serif;
+    overflow: hidden;
+    transition: background .25s, color .25s;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input { font: inherit; }
+  ::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+
+  /* ---------- login ---------- */
+  #login {
+    position: fixed; inset: 0; z-index: 40; display: flex;
+    align-items: center; justify-content: center;
+    background:
+      radial-gradient(1100px 520px at 18% -12%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
+      radial-gradient(900px 460px at 92% 112%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 55%),
+      var(--bg);
+  }
+  #login[hidden] { display: none; }
+  .login-card {
+    width: min(372px, calc(100vw - 48px));
+    background: var(--panel); border: 1px solid var(--edge); border-radius: var(--r-lg);
+    padding: 36px 34px 32px; box-shadow: var(--shadow);
+  }
+  .login-card .mark {
+    width: 46px; height: 46px; border-radius: 13px; margin-bottom: 20px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 88%, #000), var(--accent));
+    display: grid; place-items: center; font-size: 21px; color: #fff;
+  }
+  .login-card h1 { font-size: 20px; font-weight: 600; letter-spacing: .005em; }
+  .login-card p { color: var(--muted); font-size: 13px; margin: 7px 0 24px; }
+  .login-card label {
+    display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+    margin-bottom: 7px; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .login-card input {
+    width: 100%; padding: 12px 14px; border-radius: var(--r);
+    border: 1px solid var(--edge-2); background: var(--bg-2); color: var(--ink);
+    outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .login-card input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .login-card input.shake { animation: shake .35s; border-color: var(--err); }
+  @keyframes shake { 20% {transform:translateX(-5px)} 40% {transform:translateX(5px)} 60% {transform:translateX(-3px)} 80% {transform:translateX(3px)} }
+  .login-err { color: var(--err); font-size: 12.5px; min-height: 19px; margin: 8px 0 10px; }
+  .login-card button[type=submit] {
+    width: 100%; padding: 12px; border-radius: var(--r); font-weight: 600; font-size: 14px;
+    background: var(--accent); color: #fff; transition: background .15s, transform .06s;
+  }
+  [data-theme="dark"] .login-card button[type=submit] { color: #0a1524; }
+  .login-card button[type=submit]:hover { background: var(--accent-2); }
+  .login-card button[type=submit]:active { transform: translateY(1px); }
+  .login-card button[type=submit]:disabled { opacity: .6; cursor: wait; }
+
+  /* ---------- app frame ---------- */
+  #app { display: none; height: 100%; }
+  #app.on { display: grid; grid-template-rows: 57px 1fr; }
+  header {
+    display: flex; align-items: center; gap: 13px; padding: 0 18px;
+    background: color-mix(in srgb, var(--panel) 88%, transparent);
+    border-bottom: 1px solid var(--edge);
+    backdrop-filter: blur(10px); position: relative; z-index: 20;
+  }
+  header .mark { width: 30px; height: 30px; border-radius: 9px; flex: none;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 88%, #000), var(--accent));
+    display: grid; place-items: center; font-size: 15px; color: #fff; }
+  header h1 { font-size: 15.5px; font-weight: 600; white-space: nowrap; letter-spacing: .002em; }
+  #updated { color: var(--muted); font-size: 11.5px; white-space: nowrap; padding-top: 2px; }
+  #search {
+    margin-left: auto; width: min(300px, 32vw); padding: 8px 12px;
+    border-radius: var(--r); border: 1px solid var(--edge-2); background: var(--bg-2);
+    color: var(--ink); outline: none; transition: border-color .15s, width .2s, box-shadow .15s;
+  }
+  #search:focus {
+    border-color: var(--accent); width: min(370px, 42vw);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+  .hbtn { padding: 8px; border-radius: 9px; color: var(--muted); font-size: 15px; line-height: 1; }
+  .hbtn:hover { background: var(--panel-2); color: var(--ink); }
+  #paneltoggle { display: none; }
+
+  main { display: grid; grid-template-columns: 296px 1fr; min-height: 0; }
+
+  /* ---------- left panel ---------- */
+  #side {
+    border-right: 1px solid var(--edge); background: var(--bg-2);
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  #chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 13px 13px 11px; border-bottom: 1px solid var(--edge); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 500;
+    border: 1px solid var(--edge-2); color: var(--ink-2); background: var(--panel);
+    transition: border-color .15s, opacity .15s, box-shadow .15s;
+  }
+  .chip .n { color: var(--muted); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+  .chip.on { border-color: color-mix(in srgb, var(--c) 55%, var(--edge-2)); color: var(--ink); }
+  .chip.off { opacity: .35; }
+  #list { overflow-y: auto; flex: 1; padding: 4px 0 24px; }
+  #list::-webkit-scrollbar { width: 9px; }
+  #list::-webkit-scrollbar-thumb { background: var(--edge-2); border-radius: 9px; }
+  .cat-h {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); padding: 15px 17px 6px; display: flex; align-items: center; gap: 8px;
+  }
+  .cat-h .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+  .item {
+    width: 100%; text-align: left; display: flex; align-items: center; gap: 9px;
+    padding: 7.5px 15px 7.5px 13px; border-left: 2px solid transparent;
+    color: var(--ink-2); font-size: 12.8px; transition: background .12s, color .12s;
+  }
+  .item:hover { background: var(--panel); color: var(--ink); }
+  .item.sel { background: var(--panel); color: var(--ink); border-left-color: var(--c); }
+  .item .st { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--c); }
+  .item .st.established { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 20%, transparent); }
+  .item .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .fs { margin-left: auto; color: var(--muted); font-size: 10.5px; flex: none; font-variant-numeric: tabular-nums; }
+  .empty-note { color: var(--muted); font-size: 12.5px; padding: 18px 17px; }
+
+  /* ---------- graph ---------- */
+  #graphwrap {
+    position: relative; min-width: 0;
+    background:
+      radial-gradient(circle at 50% 40%, transparent 0%, transparent 100%),
+      var(--bg);
+    background-image: radial-gradient(var(--bg-dot) 1.05px, transparent 1.05px);
+    background-size: 26px 26px;
+  }
+  svg { display: block; width: 100%; height: 100%; cursor: grab; }
+  svg:active { cursor: grabbing; }
+  .link { stroke: var(--link); stroke-opacity: .55; stroke-width: 1.2px; transition: stroke-opacity .15s, stroke .15s; }
+  .link.hi { stroke: var(--accent); stroke-opacity: 1; stroke-width: 2.2px; }
+  .link.dim { stroke-opacity: .1; }
+  .node { cursor: pointer; }
+  .node circle { stroke-width: 1.8; stroke: var(--node-stroke); }
+  .node .halo { fill: none; opacity: 0; transition: opacity .18s; stroke-width: 1.4; }
+  .node:hover .halo, .node.hi .halo { opacity: .5; }
+  .node.dim { opacity: .18; }
+  .node text {
+    fill: var(--node-text); font-size: 10.5px; font-family: "Lexend", sans-serif;
+    paint-order: stroke; stroke: var(--bg); stroke-width: 3.6px; stroke-linejoin: round;
+    pointer-events: none;
+  }
+  .node.hi text, .node:hover text { fill: var(--ink); font-weight: 500; }
+  #loadmsg {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    color: var(--muted); font-size: 13px; pointer-events: none;
+  }
+  #loadmsg[hidden] { display: none; }
+
+  /* ---------- detail card ---------- */
+  #card {
+    position: absolute; top: 14px; right: 14px; width: min(344px, calc(100% - 28px));
+    max-height: calc(100% - 28px); overflow-y: auto; z-index: 15;
+    background: var(--panel); border: 1px solid var(--edge); border-radius: var(--r-lg);
+    padding: 19px 21px 17px; box-shadow: var(--shadow);
+    animation: cardin .2s cubic-bezier(.2,.9,.3,1);
+  }
+  @keyframes cardin { from { opacity: 0; transform: translateY(8px) scale(.99); } }
+  #card[hidden] { display: none; }
+  #card::-webkit-scrollbar { width: 8px; }
+  #card::-webkit-scrollbar-thumb { background: var(--edge-2); border-radius: 8px; }
+  #card .k { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  #card .k .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  #card .k span { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  #card h2 { font-size: 17px; font-weight: 600; line-height: 1.35; margin-right: 26px; letter-spacing: .001em; }
+  #card .meta { color: var(--muted); font-size: 11.5px; margin: 6px 0 13px; }
+  #card p { font-size: 13px; color: var(--ink-2); line-height: 1.65; }
+  #card .aliases { color: var(--muted); font-size: 11.5px; margin-top: 9px; }
+  #card h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 17px 0 8px; }
+  .relbtn {
+    display: block; width: 100%; text-align: left; padding: 8.5px 12px; margin-bottom: 5px;
+    border-radius: var(--r); border: 1px solid var(--edge); background: var(--bg-2);
+    color: var(--ink-2); font-size: 12.5px; transition: border-color .12s, color .12s, background .12s;
+  }
+  .relbtn:hover { border-color: var(--accent); color: var(--ink); background: var(--panel); }
+  .relbtn .t { color: var(--accent); font-size: 10.5px; margin-right: 6px; font-weight: 500; }
+  #card a.src {
+    display: block; color: var(--accent); text-decoration: none; font-size: 12px;
+    margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  #card a.src:hover { text-decoration: underline; }
+  #card .x {
+    position: absolute; top: 10px; right: 12px; padding: 6px; border-radius: 9px;
+    color: var(--muted); font-size: 13px;
+  }
+  #card .x:hover { color: var(--ink); background: var(--panel-2); }
+
+  #hint {
+    position: absolute; left: 50%; transform: translateX(-50%); bottom: 15px;
+    color: var(--muted); font-size: 11.5px; pointer-events: none; z-index: 5;
+    background: color-mix(in srgb, var(--panel) 82%, transparent); padding: 5px 13px;
+    border-radius: 999px; border: 1px solid var(--edge); backdrop-filter: blur(6px);
+  }
+
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+    #side {
+      position: absolute; inset: 57px 0 0 0; z-index: 18; transform: translateX(-100%);
+      transition: transform .22s ease; width: 296px; box-shadow: 10px 0 34px rgba(0,0,0,.14);
+    }
+    #side.open { transform: translateX(0); }
+    #paneltoggle { display: grid; place-items: center; }
+    #search { width: 32vw; }
+    #card { width: calc(100% - 28px); }
+    #updated { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 </head>
 <body>
-<header>
-  <h1>Emerging AI Concepts</h1>
-  <span class="sub">living ontology · 2024 → now · weekly growth</span>
-  <span class="count" id="count"></span>
-</header>
-<div id="legend"></div>
-<div id="card"><span class="close" onclick="card.style.display='none'">✕</span>
-  <h2 id="c-title"></h2><div class="meta" id="c-meta"></div>
-  <p id="c-sum"></p><div id="c-src"></div></div>
-<div id="hint">drag to pan · scroll to zoom · click a node</div>
+
+<div id="login" hidden>
+  <form class="login-card" id="loginform">
+    <div class="mark">✳</div>
+    <h1>AI Concepts</h1>
+    <p>Living ontology of emerging AI · 2024 → now</p>
+    <label for="pw">Password</label>
+    <input id="pw" type="password" autocomplete="current-password" autofocus>
+    <div class="login-err" id="loginerr" role="alert"></div>
+    <button type="submit" id="loginbtn">Enter</button>
+  </form>
+</div>
+
+<div id="app">
+  <header>
+    <button id="paneltoggle" class="hbtn" aria-label="Toggle concept list">☰</button>
+    <div class="mark">✳</div>
+    <h1>AI Concepts</h1>
+    <span id="updated"></span>
+    <input id="search" type="search" placeholder="Search concepts…" aria-label="Search concepts" autocomplete="off">
+    <button id="themebtn" class="hbtn" aria-label="Toggle dark mode" title="Toggle theme">◐</button>
+    <button id="logout" class="hbtn" aria-label="Log out" title="Log out">⎋</button>
+  </header>
+  <main>
+    <aside id="side">
+      <div id="chips"></div>
+      <div id="list"></div>
+    </aside>
+    <div id="graphwrap">
+      <div id="loadmsg">loading graph…</div>
+      <div id="card" hidden>
+        <button class="x" id="cardx" aria-label="Close">✕</button>
+        <div class="k"><span class="dot" id="c-dot"></span><span id="c-cat"></span></div>
+        <h2 id="c-title"></h2>
+        <div class="meta" id="c-meta"></div>
+        <p id="c-sum"></p>
+        <div class="aliases" id="c-alias"></div>
+        <div id="c-rels"></div>
+        <div id="c-src"></div>
+      </div>
+      <div id="hint">drag to pan · scroll to zoom · click a node · / to search</div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script>
-window.onerror = function (m) {
-  var h = document.getElementById("hint");
-  if (h) h.textContent = "error: " + m;
+"use strict";
+const $ = (id) => document.getElementById(id);
+
+/* per-theme category colors: readable on both light and dark */
+const COLORS_LIGHT = {
+  reasoning:"#c73e3e", agents:"#b06a14", architecture:"#2277b8",
+  training:"#8442b8", retrieval:"#128a5e", multimodal:"#bb3a76",
+  infrastructure:"#4c5fc4", "interaction-protocols":"#77851b",
+  evaluation:"#0e7f8c", safety:"#bd5a22"
 };
-</script>
-<script>
-document.getElementById("hint").textContent = "booting graph…";
-const COLORS = {
-  reasoning:"#e05f5f", agents:"#e0a95f", architecture:"#5fb8e0",
+const COLORS_DARK = {
+  reasoning:"#e0655f", agents:"#e0a55f", architecture:"#5fb8e0",
   training:"#b45fe0", retrieval:"#5fe0a0", multimodal:"#e05fb4",
   infrastructure:"#8f9fe0", "interaction-protocols":"#c9e05f",
   evaluation:"#5fd9e0", safety:"#e08f5f"
 };
-fetch("ontology.json").then(r => r.json()).then(o => {
-  const concepts = o.concepts, rels = o.relations;
-  document.getElementById("count").textContent =
-    concepts.length + " concepts · " + rels.length + " relations · updated " + o.meta.updated;
-  const W = innerWidth, H = innerHeight;
-  const svg = d3.select("body").append("svg").attr("width", W).attr("height", H);
-  const g = svg.append("g");
-  svg.call(d3.zoom().scaleExtent([0.15, 8]).on("zoom", e => g.attr("transform", e.transform)));
+const COLORS = () =>
+  document.documentElement.dataset.theme === "dark" ? COLORS_DARK : COLORS_LIGHT;
 
-  const nodes = concepts.map(c => ({...c}));
-  const byId = new Map(nodes.map(n => [n.id, n]));
-  const links = rels.filter(r => byId.has(r.from) && byId.has(r.to))
-    .map(r => ({source: r.from, target: r.to, type: r.type}));
+const state = { o: null, nodes: [], links: [], sim: null, selected: null, q: "", nod: null, sel: null, byId: null };
 
-  const link = g.append("g").selectAll("line").data(links).join("line")
-    .attr("class", "link");
-  const node = g.append("g").selectAll("g").data(nodes).join("g")
-    .attr("class", "node")
-    .call(d3.drag()
-      .on("start", (e, d) => { if (!e.active) sim.alphaTarget(.25).restart(); d.fx = d.x; d.fy = d.y; })
-      .on("drag",  (e, d) => { d.fx = e.x; d.fy = e.y; })
-      .on("end",   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+/* ---------- theme ---------- */
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem("theme", t); } catch {}
+  if (state.o) repaintGraph();
+}
+(() => {
+  let saved = null;
+  try { saved = localStorage.getItem("theme"); } catch {}
+  setTheme(saved === "dark" ? "dark" : "light");
+})();
+$("themebtn").addEventListener("click", () =>
+  setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
 
-  node.append("circle")
-    .attr("r", d => 7 + Math.sqrt(links.filter(l => l.source === d.id || l.target === d.id).length) * 2.1)
-    .attr("fill", d => COLORS[d.category] || "#888")
-    .attr("stroke", "rgba(0,0,0,.45)")
-    .attr("class", d => d.status || "emerging");
-  node.append("text").attr("dx", 12).attr("dy", 3.5).text(d => d.label);
+function repaintGraph() {
+  if (!state.nod) return;
+  const colors = COLORS();
+  state.nod.select("circle").attr("fill", (d) => colors[d.category] || "#888");
+  state.nod.select(".halo").attr("stroke", (d) => colors[d.category] || "#888");
+}
 
-  const card = document.getElementById("card");
-  node.on("click", (e, d) => {
-    document.getElementById("c-title").textContent = d.label;
-    document.getElementById("c-meta").textContent =
-      d.category + " · first seen " + d.first_seen + " · " + (d.status || "emerging") +
-      (d.aliases && d.aliases.length ? " · aka " + d.aliases.join(", ") : "");
-    document.getElementById("c-sum").textContent = d.summary || "";
-    const src = document.getElementById("c-src");
-    src.innerHTML = "";
-    (d.sources || []).forEach(s => {
-      const a = document.createElement("a");
-      a.href = s.url; a.textContent = s.title || s.url; a.target = "_blank";
-      src.appendChild(a);
-    });
-    card.style.display = "block";
-    e.stopPropagation();
+/* ---------- auth ---------- */
+async function tryLogin(password) {
+  const r = await fetch("/api/login", {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({password})
   });
-
-  const sim = d3.forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id(d => d.id).distance(95).strength(.35))
-    .force("charge", d3.forceManyBody().strength(-340))
-    .force("center", d3.forceCenter(W / 2, H / 2))
-    .force("collide", d3.forceCollide(26))
-    .on("tick", () => {
-      link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-          .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-      node.attr("transform", d => `translate(${d.x},${d.y})`);
-    });
-
-  document.getElementById("hint").textContent =
-    "drag to pan · scroll to zoom · click a node";
-  const legend = document.getElementById("legend");
-  Object.entries(COLORS).forEach(([cat, col]) => {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `<span class="dot" style="background:${col}"></span>${cat}`;
-    row.onclick = () => {
-      row.classList.toggle("off");
-      const off = row.classList.contains("off");
-      node.filter(d => d.category === cat).style("display", off ? "none" : "");
-      link.attr("display", d => {
-        const s = d.source.id || d.source, t = d.target.id || d.target;
-        const vis = n => byId.get(n) && byId.get(n).category !== cat || !off ? true : false;
-        return (vis(s) && vis(t)) ? null : "none";
-      }).style("opacity", d => {
-        const s = d.source.id || d.source, t = d.target.id || d.target;
-        return (byId.get(s)?.category === cat || byId.get(t)?.category === cat) && off ? 0.08 : .5;
-      });
-    };
-    legend.appendChild(row);
-  });
+  return r.ok;
+}
+$("loginform").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("loginbtn"), err = $("loginerr"), pw = $("pw");
+  btn.disabled = true; btn.textContent = "Checking…"; err.textContent = "";
+  const ok = await tryLogin(pw.value);
+  btn.disabled = false; btn.textContent = "Enter";
+  if (ok) enterApp();
+  else {
+    err.textContent = "Wrong password — try again.";
+    pw.classList.remove("shake"); void pw.offsetWidth; pw.classList.add("shake");
+    pw.focus(); pw.select();
+  }
 });
+$("logout").addEventListener("click", () => {
+  document.cookie = "aionto=; Max-Age=0; Path=/";
+  location.reload();
+});
+
+/* ---------- boot ---------- */
+(async () => {
+  const r = await fetch("/api/ontology");
+  if (r.status === 401) { $("login").hidden = false; $("pw").focus(); return; }
+  if (!r.ok) { $("login").hidden = false; $("loginerr").textContent = "server error — retry shortly"; return; }
+  enterApp(await r.json());
+})();
+
+async function enterApp(onto) {
+  $("login").hidden = true;
+  $("app").classList.add("on");
+  if (!onto) {
+    const r = await fetch("/api/ontology");
+    if (!r.ok) return;
+    onto = await r.json();
+  }
+  state.o = onto;
+  $("updated").textContent = "· updated " + onto.meta.updated;
+  buildSidebar();
+  buildGraph();
+}
+
+/* ---------- sidebar ---------- */
+function visibleConcepts() {
+  const q = state.q.toLowerCase();
+  return state.o.concepts.filter((c) => !q ||
+    c.label.toLowerCase().includes(q) ||
+    (c.aliases || []).some((a) => a.toLowerCase().includes(q)) ||
+    (c.summary || "").toLowerCase().includes(q));
+}
+function buildSidebar() {
+  const colors = COLORS();
+  const cats = Object.keys(colors);
+  const counts = {};
+  for (const c of state.o.concepts) counts[c.category] = (counts[c.category] || 0) + 1;
+
+  const chips = $("chips"); chips.innerHTML = "";
+  for (const cat of cats) {
+    const b = document.createElement("button");
+    b.className = "chip on"; b.style.setProperty("--c", colors[cat]);
+    b.dataset.cat = cat;
+    b.innerHTML = `<span>${cat}</span><span class="n">${counts[cat] || 0}</span>`;
+    b.setAttribute("aria-pressed", "true");
+    b.onclick = () => {
+      b.classList.toggle("off"); b.classList.toggle("on");
+      b.setAttribute("aria-pressed", String(b.classList.contains("on")));
+      applyFilters();
+    };
+    chips.appendChild(b);
+  }
+  renderList();
+}
+function renderList() {
+  const colors = COLORS();
+  const list = $("list"); list.innerHTML = "";
+  const vis = visibleConcepts();
+  const offCats = new Set(
+    [...document.querySelectorAll(".chip.off")].map((c) => c.dataset.cat));
+  const byCat = {};
+  for (const c of vis) (byCat[c.category] = byCat[c.category] || []).push(c);
+  for (const cat of Object.keys(colors)) {
+    const items = (byCat[cat] || []).filter((c) => !offCats.has(c.category));
+    if (!items.length) continue;
+    const h = document.createElement("div");
+    h.className = "cat-h"; h.style.setProperty("--c", colors[cat]);
+    h.innerHTML = `<span class="dot"></span>${cat} · ${items.length}`;
+    list.appendChild(h);
+    for (const c of items) {
+      const b = document.createElement("button");
+      b.className = "item" + (state.selected === c.id ? " sel" : "");
+      b.style.setProperty("--c", colors[cat]);
+      b.innerHTML = `<span class="st ${c.status || "emerging"}"></span>
+        <span class="lbl">${c.label}</span><span class="fs">${c.first_seen}</span>`;
+      b.onclick = () => { selectNode(c.id); openCard(c); };
+      list.appendChild(b);
+    }
+  }
+  if (!vis.length) {
+    const d = document.createElement("div");
+    d.className = "empty-note";
+    d.textContent = 'no concepts match "' + state.q + '"';
+    list.appendChild(d);
+  }
+}
+$("search").addEventListener("input", (e) => {
+  state.q = e.target.value;
+  applyFilters();
+  renderList();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement !== $("search") && $("app").classList.contains("on")) {
+    e.preventDefault(); $("search").focus();
+  }
+  if (e.key === "Escape") closeCard();
+});
+
+/* ---------- graph ---------- */
+function buildGraph() {
+  const wrap = $("graphwrap");
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  const colors = COLORS();
+  const svg = d3.select("#graphwrap").append("svg");
+  svg.attr("viewBox", [0, 0, W, H]);
+  const g = svg.append("g");
+  svg.call(d3.zoom().scaleExtent([0.12, 8]).on("zoom", (e) => g.attr("transform", e.transform)));
+
+  state.nodes = state.o.concepts.map((c) => ({ ...c }));
+  const byId = new Map(state.nodes.map((n) => [n.id, n]));
+  state.byId = byId;
+  state.links = state.o.relations
+    .filter((r) => byId.has(r.from) && byId.has(r.to))
+    .map((r) => ({ source: r.from, target: r.to, type: r.type }));
+
+  const deg = {};
+  for (const l of state.links) {
+    deg[l.source] = (deg[l.source] || 0) + 1;
+    deg[l.target] = (deg[l.target] || 0) + 1;
+  }
+
+  state.sel = svg.append("g").selectAll(".link")
+    .data(state.links).join("line").attr("class", "link");
+  state.nod = svg.append("g").selectAll(".node")
+    .data(state.nodes, (d) => d.id).join("g").attr("class", "node")
+    .call(d3.drag()
+      .on("start", (e, d) => { if (!e.active) state.sim.alphaTarget(.25).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on("end", (e, d) => { if (!e.active) state.sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  state.nod.append("circle")
+    .attr("r", (d) => 6.5 + Math.sqrt(deg[d.id] || 0) * 2.0)
+    .attr("fill", (d) => colors[d.category] || "#888");
+  state.nod.append("circle").attr("class", "halo")
+    .attr("r", (d) => 10.5 + Math.sqrt(deg[d.id] || 0) * 2.0)
+    .attr("stroke", (d) => colors[d.category] || "#888");
+  state.nod.append("text").attr("dx", 13).attr("dy", 3.6).text((d) => d.label);
+
+  state.sim = d3.forceSimulation(state.nodes)
+    .force("link", d3.forceLink(state.links).id((d) => d.id).distance(96).strength(.32))
+    .force("charge", d3.forceManyBody().strength(-330))
+    .force("center", d3.forceCenter(W / 2, H / 2))
+    .force("collide", d3.forceCollide(27))
+    .on("tick", () => {
+      state.sel.attr("x1", (d) => d.source.x).attr("y1", (d) => d.source.y)
+              .attr("x2", (d) => d.target.x).attr("y2", (d) => d.target.y);
+      state.nod.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    });
+
+  state.nod.on("mouseenter", (e, d) => highlight(d.id, true))
+         .on("mouseleave", () => highlight(null))
+         .on("click", (e, d) => { selectNode(d.id); openCard(d); e.stopPropagation(); });
+  svg.on("click", () => closeCard());
+
+  $("loadmsg").hidden = true;
+  window.addEventListener("resize", () => {
+    state.sim.force("center", d3.forceCenter(wrap.clientWidth / 2, wrap.clientHeight / 2));
+    svg.attr("viewBox", [0, 0, wrap.clientWidth, wrap.clientHeight]);
+  });
+}
+function neighbors(id) {
+  const n = new Set([id]);
+  for (const l of state.links) {
+    const s = l.source.id || l.source, t = l.target.id || l.target;
+    if (s === id) n.add(t);
+    if (t === id) n.add(s);
+  }
+  return n;
+}
+function highlight(id, on) {
+  if (!state.nod) return;
+  if (!on || !id) {
+    state.nod.classed("dim", false).classed("hi", false);
+    state.sel.classed("hi", false).classed("dim", false);
+    return;
+  }
+  const near = neighbors(id);
+  state.nod.classed("dim", (d) => !near.has(d.id))
+          .classed("hi", (d) => d.id === id);
+  state.sel.classed("hi", (d) => (d.source.id || d.source) === id || (d.target.id || d.target) === id)
+          .classed("dim", (d) => (d.source.id || d.source) !== id && (d.target.id || d.target) !== id);
+}
+function selectNode(id) {
+  state.selected = id;
+  const n = state.byId.get(id);
+  if (n) {
+    highlight(id, true);
+    state.sim.alphaTarget(.06).restart();
+    setTimeout(() => state.sim.alphaTarget(0), 900);
+  }
+  renderList();
+}
+function applyFilters() {
+  const q = state.q.toLowerCase();
+  const offCats = new Set([...document.querySelectorAll(".chip.off")].map((c) => c.dataset.cat));
+  const match = (c) => (!q || c.label.toLowerCase().includes(q) ||
+      (c.summary || "").toLowerCase().includes(q)) && !offCats.has(c.category);
+  if (state.nod) state.nod.style("display", (d) => (match(d) ? "" : "none"));
+  if (state.sel) state.sel.style("display", (d) => {
+    const s = d.source.id || d.source, t = d.target.id || d.target;
+    const sc = state.byId.get(s), tc = state.byId.get(t);
+    return sc && tc && match(sc) && match(tc) ? "" : "none";
+  });
+}
+
+/* ---------- detail card ---------- */
+function openCard(c) {
+  const colors = COLORS();
+  $("c-dot").style.background = colors[c.category] || "#888";
+  $("c-cat").textContent = c.category;
+  $("c-title").textContent = c.label;
+  $("c-meta").textContent = "first seen " + c.first_seen + " · " + (c.status || "emerging");
+  $("c-sum").textContent = c.summary || "";
+  $("c-alias").textContent = c.aliases && c.aliases.length ? "aka " + c.aliases.join(", ") : "";
+  const rels = $("c-rels"); rels.innerHTML = "";
+  const myRels = state.o.relations.filter((r) => r.from === c.id || r.to === c.id);
+  if (myRels.length) {
+    const h = document.createElement("h3"); h.textContent = "relations";
+    rels.appendChild(h);
+    for (const r of myRels) {
+      const other = r.from === c.id ? r.to : r.from;
+      const od = state.byId && state.byId.get(other);
+      const b = document.createElement("button");
+      b.className = "relbtn";
+      const arrow = r.from === c.id ? "→" : "←";
+      b.innerHTML = `<span class="t">${arrow} ${r.type}</span>${od ? od.label : other}`;
+      b.onclick = () => { if (od) { selectNode(od.id); openCard(od); } };
+      rels.appendChild(b);
+    }
+  }
+  const src = $("c-src"); src.innerHTML = "";
+  (c.sources || []).forEach((s) => {
+    const a = document.createElement("a");
+    a.className = "src"; a.href = s.url; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = (s.title || s.url).slice(0, 90);
+    src.appendChild(a);
+  });
+  $("card").hidden = false;
+}
+function closeCard() {
+  $("card").hidden = true;
+  highlight(null);
+}
+$("cardx").addEventListener("click", closeCard);
+$("paneltoggle").addEventListener("click", () => $("side").classList.toggle("open"));
 </script>
 </body>
 </html>
